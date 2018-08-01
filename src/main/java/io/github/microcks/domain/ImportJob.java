@@ -19,8 +19,10 @@
 package io.github.microcks.domain;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.web.bind.support.WebBindingInitializer;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -47,6 +49,7 @@ public class ImportJob {
    private String etag;
 
    private Set<ServiceRef> serviceRefs;
+   private HashMap<WebhookType,Webhook> webhooks;
 
    public String getId() {
       return id;
@@ -133,5 +136,24 @@ public class ImportJob {
          this.serviceRefs = new HashSet<>();
       }
       serviceRefs.add(serviceRef);
+   }
+
+   public HashMap<WebhookType,Webhook> getWebhooks() {
+      return this.webhooks;
+   }
+
+   public void setWebhooks(HashMap<WebhookType,Webhook> webhooks) {
+      this.webhooks = webhooks;
+   }
+
+   public void addWebhook(Webhook webhook) {
+      if (this.webhooks == null) {
+         this.webhooks = new HashMap<WebhookType,Webhook>();
+      }
+      webhooks.put(webhook.getType(), webhook);
+   }
+
+   public Webhook removeWebhook(WebhookType type) {
+       return this.getWebhooks().remove(type);
    }
 }

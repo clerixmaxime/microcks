@@ -1,0 +1,5 @@
+2018-07-31 16:17:20,342 WARN  [SoapUI] Missing folder [/Users/mclerix/workspaces/microcks/microcks/ext] for external libraries
+2018-07-31 16:17:20,342 INFO  [DefaultSoapUICore] Creating new settings at [/Users/mclerix/soapui-settings.xml]
+2018-07-31 16:17:21,016 ERROR [TestAssertionRegistry] Missing assertion for type [JsonPath Match]
+2018-07-31 16:17:21,028 ERROR [TestAssertionRegistry] Missing assertion for type [JsonPath Match]
+2018-07-31 16:17:21,209 INFO  [WsdlProject] Loaded project from [file:/var/folders/2x/zz6y3qxn5fv99mg4cg0525dm0000gn/T/microcks-1533046639764.project]

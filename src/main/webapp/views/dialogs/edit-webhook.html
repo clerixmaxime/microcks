@@ -1,0 +1,38 @@
+<form name="form" class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" aria-hidden="false" ng-click="cancel()">
+            <span class="glyphicon glyphicon-close"></span>
+          </button>
+          <h3 class="modal-title">
+            <i class="fa fa-cubes"></i> {{ webhook.id ? 'Edit' : 'Add' }} Webhook
+          </h3>
+        </div>
+        <div class="modal-body">
+          <div class="form-horizontal">
+            <fieldset>
+              <legend>Webhook properties</legend>
+              <div class="control-group">
+                <label class="control-label" for="name">Secret</label>
+                <div class="controls">
+                  <input type="text" placeholder="eg. secret101" id="secret" name="secret" class="form-control" size="20" ng-model="webhook.secret" required/>
+                  <p class="help-block">The secret that will be used to trigger the webhook.</p>
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label" for="webhookType">Webhook Type</label>
+                <div class="controls">
+                    <form>
+                        <input type="radio" name="webhookType" value="generic" class="form-control" ng-model="webhook.type" checked> Generic<br>
+                    </form>
+                  <p class="help-block">The type of webhook that you would like to create</p>
+                </div>
+              </div>
+            </fieldset>
+            <br/>
+          </div>
+          <div class="modal-footer">
+            <input type="button" class="btn btn-default" ng-click="cancel()" value="Cancel" />
+            <input type="submit" class="btn btn-primary" ng-click="ok(job)" ng-disabled="form.$invalid" value="{{job.id ? 'Save' : 'Add'}}" />
+          </div>
+        </div>
+      </form>

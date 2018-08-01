@@ -30,6 +30,7 @@
         <span class="label label-default" ng-show="!job.lastImportDate">Not Imported</span>
         <span class="label label-success" ng-show="job.active">Scanned</span>
         <span class="label label-primary" ng-show="!job.active">Not scanned</span>
+        <span class="label label-primary" ng-show="job.webhooks.generic">Webhook</span>
         <a href="#" tooltip="{{ job.lastImportError }}" ng-show="{{ job.lastImportError }}">
           <span class="label label-danger">Import error</span>
         </a>

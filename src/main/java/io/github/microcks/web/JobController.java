@@ -19,8 +19,13 @@
 package io.github.microcks.web;
 
 import io.github.microcks.domain.ImportJob;
+import io.github.microcks.domain.Webhook;
+import io.github.microcks.domain.WebhookType;
 import io.github.microcks.repository.ImportJobRepository;
+import io.github.microcks.repository.WebhookRepository;
 import io.github.microcks.service.JobService;
+import io.github.microcks.service.WebhookService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +33,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -56,6 +63,11 @@ public class JobController {
    @Autowired
    private JobService jobService;
 
+   @Autowired
+   private WebhookService webhookService;
+
+   @Autowired
+   private WebhookRepository webhookRepository;
 
    @RequestMapping(value = "/jobs", method = RequestMethod.GET)
    public List<ImportJob> listJobs(
@@ -128,5 +140,47 @@ public class JobController {
       log.debug("Removing job with id {}", jobId);
       jobRepository.delete(jobId);
       return new ResponseEntity<>(HttpStatus.OK);
+   }
+
+   @PostMapping("/jobs/{id}/webhook")
+   public ResponseEntity<ImportJob> addWebhookToJob(
+         @PathVariable("id") String jobId, @RequestBody Webhook webhook) {
+      log.debug("Creating webhook for job with id {} and value {}", jobId, webhook);
+      Webhook hook = webhookRepository.save(webhook);
+      ImportJob job = jobRepository.findOne(jobId);
+      job.addWebhook(hook);
+      return new ResponseEntity<>(jobRepository.save(job), HttpStatus.CREATED);
+   }
+
+   @DeleteMapping("/jobs/{id}/webhook/{webhookType}")
+   public ResponseEntity<ImportJob> deleteWebhookFromJob(
+         @PathVariable("id") String jobId, @PathVariable("webhookType") WebhookType type) {
+               
+      log.debug("Deleting webhook with type {} for job with id {}", type, jobId);
+
+      ImportJob job = jobRepository.findOne(jobId);
+      Webhook hook = job.removeWebhook(type);
+      webhookRepository.delete(hook);
+      return new ResponseEntity<>(jobRepository.save(job), HttpStatus.OK);
+   }
+
+   @PostMapping("/jobs/{id}/webhook/{secret}/{webhookType}")
+   public ResponseEntity<String> triggerWebhook(
+         @PathVariable("id") String jobId, @PathVariable("secret") String webhookSecret, @PathVariable("webhookType") WebhookType webhookType) {
+      
+      log.debug("Triggering generic webhook for job with id {}", jobId);
+
+      if (webhookService.checkSecret(jobId, webhookSecret, webhookType)) {
+            log.debug("Triggering job with id {}", jobId);
+            ImportJob job = jobRepository.findOne(jobId);
+            if (job != null){
+                  jobService.doImportJob(job);
+                  return new ResponseEntity<>("Job triggered", HttpStatus.OK);
+            } else {
+                  return new ResponseEntity<>("Job not found", HttpStatus.NOT_FOUND);
+            } 
+      } else {
+            return new ResponseEntity<>("Invalid secret", HttpStatus.BAD_REQUEST);
+      }
    }
 }
